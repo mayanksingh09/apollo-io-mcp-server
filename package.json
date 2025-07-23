@@ -1,0 +1,52 @@
+{
+  "name": "apollo-io-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Apollo.io integration - enables AI assistants to search people, organizations, and gather sales intelligence",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.ts",
+    "clean": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mayanksingh09/apollo-io-mcp-server.git"
+  },
+  "keywords": [
+    "mcp",
+    "apollo",
+    "sales",
+    "crm",
+    "ai",
+    "assistant"
+  ],
+  "author": "Mayank Singh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mayanksingh09/apollo-io-mcp-server/issues"
+  },
+  "homepage": "https://github.com/mayanksingh09/apollo-io-mcp-server#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "axios": "^1.10.0",
+    "dotenv": "^17.2.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.31.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
