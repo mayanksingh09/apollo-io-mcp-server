@@ -72,7 +72,7 @@ npm run clean    # Remove dist/ directory
 Required: `APOLLO_API_KEY` in `.env` file
 
 Optional:
-- `MCP_SERVER_PORT` (default: 3000)
+- `MCP_SERVER_PORT` (default: 8000)
 - `LOG_LEVEL` (debug|info|warn|error, default: info)
 
 ## Testing Locally

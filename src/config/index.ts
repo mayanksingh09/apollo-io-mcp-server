@@ -32,7 +32,7 @@ function validateConfig(): Config {
       baseUrl: "https://api.apollo.io/api/v1",
     },
     server: {
-      port: parseInt(process.env.MCP_SERVER_PORT || "3000", 10),
+      port: parseInt(process.env.MCP_SERVER_PORT || "8000", 10),
     },
     logging: {
       level: (process.env.LOG_LEVEL || "info") as Config["logging"]["level"],
