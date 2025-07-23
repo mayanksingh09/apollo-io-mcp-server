@@ -17,13 +17,16 @@ import {
   organizationSearchSchema,
   peopleEnrichmentTool,
   peopleEnrichmentDefinition,
+  peopleEnrichmentSchema,
   peopleMatchTool,
   peopleMatchDefinition,
   peopleMatchSchema,
   organizationEnrichmentTool,
   organizationEnrichmentDefinition,
+  organizationEnrichmentSchema,
   jobPostingsTool,
   jobPostingsDefinition,
+  jobPostingsSchema,
 } from "./tools/index.js";
 
 class ApolloMCPServer {
@@ -88,7 +91,7 @@ class ApolloMCPServer {
           }
 
           case "people_enrichment": {
-            const params = peopleEnrichmentDefinition.inputSchema.parse(args);
+            const params = peopleEnrichmentSchema.parse(args);
             const result = await peopleEnrichmentTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
@@ -100,13 +103,13 @@ class ApolloMCPServer {
           }
 
           case "organization_enrichment": {
-            const params = organizationEnrichmentDefinition.inputSchema.parse(args);
+            const params = organizationEnrichmentSchema.parse(args);
             const result = await organizationEnrichmentTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
 
           case "job_postings": {
-            const params = jobPostingsDefinition.inputSchema.parse(args);
+            const params = jobPostingsSchema.parse(args);
             const result = await jobPostingsTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }

@@ -320,7 +320,7 @@ async function testEmailWorkflowDirect(apolloClient: ApolloClient) {
     const searchResult = await peopleSearchTool(searchParams, apolloClient);
     
     if (searchResult.results && searchResult.results.length > 0) {
-      log(`\n✅ Found ${searchResult.results.length} people:", colors.green);
+      log(`\n✅ Found ${searchResult.results.length} people:`, colors.green);
       
       const firstPerson = searchResult.results[0];
       log(`\nUsing first result for email retrieval:`);

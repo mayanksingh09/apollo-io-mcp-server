@@ -13,7 +13,7 @@ export const peopleSearchSchema = z.object({
   location: z.string().optional().describe("Location (city, state, or country)"),
   industry: z.string().optional().describe("Industry"),
   person_titles: z.array(z.string()).optional().describe("List of job titles"),
-  organization_domains: z.array(z.string()).optional().Ndescribe("List of company domains"),
+  organization_domains: z.array(z.string()).optional().describe("List of company domains"),
   person_locations: z.array(z.string()).optional().describe("List of locations"),
   organization_locations: z.array(z.string()).optional().describe("List of company locations"),
   q_organization_domains: z.array(z.string()).optional().describe("Query by organization domains"),

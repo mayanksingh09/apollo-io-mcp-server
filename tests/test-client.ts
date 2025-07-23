@@ -370,7 +370,7 @@ async function testEmailWorkflow(client: Client) {
       return;
     }
     
-    log(`\n✅ Found ${searchData.results.length} people:", colors.green);
+    log(`\n✅ Found ${searchData.results.length} people:`, colors.green);
     searchData.results.forEach((person: any, index: number) => {
       log(`\n${index + 1}. ${person.name}`);
       log(`   Title: ${person.title || "N/A"}`);

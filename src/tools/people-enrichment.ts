@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { ApolloClient } from "../apollo-client.js";
 import { logger } from "../utils/logger.js";
 import type { PeopleEnrichmentRequest } from "../types/apollo.js";
@@ -69,5 +70,5 @@ export async function peopleEnrichmentTool(
 export const peopleEnrichmentDefinition = {
   name: "people_enrichment",
   description: "Enrich person data using email, LinkedIn URL, or name with company information",
-  inputSchema: peopleEnrichmentSchema,
+  inputSchema: zodToJsonSchema(peopleEnrichmentSchema),
 };
