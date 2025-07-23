@@ -3,6 +3,8 @@ import * as dotenv from "dotenv";
 import { ApolloClient } from "../src/apollo-client.js";
 import { peopleSearchTool } from "../src/tools/people-search.js";
 import { organizationSearchTool } from "../src/tools/organization-search.js";
+import { peopleEnrichmentTool } from "../src/tools/people-enrichment.js";
+import { peopleMatchTool } from "../src/tools/people-match.js";
 // Type definitions for the transformed results from our tools
 interface PersonResult {
   id: string;
@@ -77,6 +79,18 @@ async function manualTest() {
 
     if (testType === "org" || testType === "both") {
       await testOrganizationSearchDirect(apolloClient);
+    }
+
+    if (testType === "enrichment") {
+      await testPeopleEnrichmentDirect(apolloClient);
+    }
+
+    if (testType === "match") {
+      await testPeopleMatchDirect(apolloClient);
+    }
+
+    if (testType === "email") {
+      await testEmailWorkflowDirect(apolloClient);
     }
 
     log("\n✅ All tests completed successfully!", colors.green);
@@ -201,14 +215,163 @@ async function testOrganizationSearchDirect(apolloClient: ApolloClient) {
   }
 }
 
+async function testPeopleEnrichmentDirect(apolloClient: ApolloClient) {
+  log("\n\n🔍 Testing People Enrichment (Direct API)", colors.cyan);
+  
+  const testCases = [
+    {
+      name: "Enrich by Email",
+      params: {
+        email: "john.smith@example.com",
+      },
+    },
+    {
+      name: "Enrich by Name and Company",
+      params: {
+        name: "Jane Doe",
+        organization_name: "Acme Corporation",
+      },
+    },
+  ];
+
+  for (const testCase of testCases) {
+    log(`\n📌 Test: ${testCase.name}`, colors.yellow);
+    log(`Parameters: ${JSON.stringify(testCase.params, null, 2)}`, colors.cyan);
+
+    try {
+      const result = await peopleEnrichmentTool(testCase.params, apolloClient);
+      
+      log("\n✅ Results:", colors.green);
+      if (result.found) {
+        const person = result.person;
+        log(`\n${colors.bright}Person Found:${colors.reset}`);
+        log(`  Name: ${person.name}`);
+        log(`  Title: ${person.title || "N/A"}`);
+        log(`  Email: ${person.email || "N/A"}`);
+        log(`  Company: ${person.company?.name || "N/A"}`);
+        log(`  Location: ${person.location || "N/A"}`);
+        log(`  LinkedIn: ${person.linkedin_url || "N/A"}`);
+      } else {
+        log(result.message, colors.yellow);
+      }
+    } catch (error) {
+      log(`❌ Test failed: ${error}`, colors.red);
+    }
+  }
+}
+
+async function testPeopleMatchDirect(apolloClient: ApolloClient) {
+  log("\n\n🔍 Testing People Match (Direct API)", colors.cyan);
+  log("Note: This endpoint consumes API credits!", colors.yellow);
+  
+  const testCases = [
+    {
+      name: "Match by Name and Company",
+      params: {
+        name: "Tim Cook",
+        organization_name: "Apple",
+        reveal_personal_emails: true,
+        reveal_phone_number: true,
+      },
+    },
+  ];
+
+  for (const testCase of testCases) {
+    log(`\n📌 Test: ${testCase.name}`, colors.yellow);
+    log(`Parameters: ${JSON.stringify(testCase.params, null, 2)}`, colors.cyan);
+
+    try {
+      const result = await peopleMatchTool(testCase.params, apolloClient);
+      
+      log("\n✅ Results:", colors.green);
+      if (result.found) {
+        const person = result.person;
+        log(`\n${colors.bright}Person Matched:${colors.reset}`);
+        log(`  Name: ${person.name}`);
+        log(`  Title: ${person.title || "N/A"}`);
+        log(`  Primary Email: ${person.email || "N/A"}`);
+        log(`  Personal Emails: ${person.personal_emails.join(", ") || "None"}`);
+        log(`  Phone Numbers: ${person.phone_numbers.join(", ") || "None"}`);
+        log(`  Company: ${person.company?.name || "N/A"}`);
+        log(`  Credits Used: ${result.credits_used}`);
+      } else {
+        log(result.message, colors.yellow);
+      }
+    } catch (error) {
+      log(`❌ Test failed: ${error}`, colors.red);
+    }
+  }
+}
+
+async function testEmailWorkflowDirect(apolloClient: ApolloClient) {
+  log("\n\n📧 Testing Email Retrieval Workflow (Search + Match)", colors.cyan);
+  log("This demonstrates the two-step process to find emails", colors.yellow);
+  
+  // Step 1: Search
+  log("\n🔍 Step 1: Searching for Sales VPs...", colors.cyan);
+  
+  const searchParams = {
+    person_functions: ["sales"],
+    person_seniorities: ["vp"],
+    per_page: 3,
+  };
+  
+  try {
+    const searchResult = await peopleSearchTool(searchParams, apolloClient);
+    
+    if (searchResult.results && searchResult.results.length > 0) {
+      log(`\n✅ Found ${searchResult.results.length} people:", colors.green);
+      
+      const firstPerson = searchResult.results[0];
+      log(`\nUsing first result for email retrieval:`);
+      log(`  Name: ${firstPerson.name}`);
+      log(`  Company: ${firstPerson.company || "N/A"}`);
+      log(`  Title: ${firstPerson.title || "N/A"}`);
+      
+      // Step 2: Match to get email
+      log("\n🔍 Step 2: Getting email via match endpoint...", colors.cyan);
+      
+      const matchParams = {
+        name: firstPerson.name,
+        organization_name: firstPerson.company,
+        domain: firstPerson.company_domain,
+        linkedin_url: firstPerson.linkedin_url,
+        reveal_personal_emails: true,
+        reveal_phone_number: true,
+      };
+      
+      const matchResult = await peopleMatchTool(matchParams, apolloClient);
+      
+      if (matchResult.found) {
+        log("\n✅ Email Retrieved Successfully:", colors.green);
+        log(`  Primary Email: ${matchResult.person.email || "Not found"}`);
+        log(`  Personal Emails: ${matchResult.person.personal_emails.join(", ") || "None"}`);
+        log(`  Phone Numbers: ${matchResult.person.phone_numbers.join(", ") || "None"}`);
+        log(`  Credits Used: ${matchResult.credits_used}`);
+      } else {
+        log("\n⚠️  Could not retrieve email", colors.yellow);
+      }
+    } else {
+      log("\nNo results found in search", colors.yellow);
+    }
+  } catch (error) {
+    log(`❌ Workflow failed: ${error}`, colors.red);
+  }
+}
+
 // Show usage if help is requested
 if (process.argv[2] === "--help" || process.argv[2] === "-h") {
   log("\nUsage: npm run test:manual [test-type]", colors.cyan);
   log("\ntest-type options:");
-  log("  people - Test only people search");
-  log("  org    - Test only organization search");
-  log("  both   - Test both (default)");
-  log("\nExample: npm run test:manual people");
+  log("  people      - Test only people search");
+  log("  org         - Test only organization search");
+  log("  enrichment  - Test people enrichment");
+  log("  match       - Test people match (uses credits!)");
+  log("  email       - Test email workflow (search + match)");
+  log("  both        - Test people and org search (default)");
+  log("\nExamples:");
+  log("  npm run test:manual people");
+  log("  npm run test:manual email");
   process.exit(0);
 }
 

@@ -17,6 +17,9 @@ import {
   organizationSearchSchema,
   peopleEnrichmentTool,
   peopleEnrichmentDefinition,
+  peopleMatchTool,
+  peopleMatchDefinition,
+  peopleMatchSchema,
   organizationEnrichmentTool,
   organizationEnrichmentDefinition,
   jobPostingsTool,
@@ -57,6 +60,7 @@ class ApolloMCPServer {
           peopleSearchDefinition,
           organizationSearchDefinition,
           peopleEnrichmentDefinition,
+          peopleMatchDefinition,
           organizationEnrichmentDefinition,
           jobPostingsDefinition,
         ],
@@ -86,6 +90,12 @@ class ApolloMCPServer {
           case "people_enrichment": {
             const params = peopleEnrichmentDefinition.inputSchema.parse(args);
             const result = await peopleEnrichmentTool(params, this.apolloClient);
+            return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+          }
+
+          case "people_match": {
+            const params = peopleMatchSchema.parse(args);
+            const result = await peopleMatchTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
 

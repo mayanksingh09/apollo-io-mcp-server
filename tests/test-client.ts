@@ -83,9 +83,12 @@ async function testMCPServer() {
       log("2. Test organization_search");
       log("3. Custom people search");
       log("4. Custom organization search");
-      log("5. Exit");
+      log("5. Test people_enrichment");
+      log("6. Test people_match");
+      log("7. Test email retrieval workflow (search + match)");
+      log("8. Exit");
 
-      const choice = await prompt("\nEnter your choice (1-5): ");
+      const choice = await prompt("\nEnter your choice (1-8): ");
 
       switch (choice) {
         case "1":
@@ -101,6 +104,15 @@ async function testMCPServer() {
           await customOrganizationSearch(client);
           break;
         case "5":
+          await testPeopleEnrichment(client);
+          break;
+        case "6":
+          await testPeopleMatch(client);
+          break;
+        case "7":
+          await testEmailWorkflow(client);
+          break;
+        case "8":
           testing = false;
           break;
         default:
@@ -271,6 +283,144 @@ async function customOrganizationSearch(client: Client) {
     }
   } catch (error) {
     log(`❌ Search failed: ${error}`, colors.red);
+  }
+}
+
+async function testPeopleEnrichment(client: Client) {
+  log("\n🔍 Testing people_enrichment...", colors.cyan);
+  
+  const email = await prompt("Enter email address (or press Enter for demo): ");
+  const linkedin = await prompt("Enter LinkedIn URL (or press Enter to skip): ");
+  
+  try {
+    const params: any = {};
+    if (email) params.email = email;
+    else params.email = "john.smith@example.com"; // Demo email
+    
+    if (linkedin) params.linkedin_url = linkedin;
+    
+    const result = await client.callTool("people_enrichment", params);
+    log("\n✅ Enrichment results:", colors.green);
+    console.warn(JSON.parse(result.content[0].text));
+  } catch (error) {
+    log(`❌ People enrichment failed: ${error}`, colors.red);
+  }
+}
+
+async function testPeopleMatch(client: Client) {
+  log("\n🔍 Testing people_match...", colors.cyan);
+  
+  const name = await prompt("Enter person's name: ");
+  const company = await prompt("Enter company name: ");
+  const domain = await prompt("Enter company domain (or press Enter to skip): ");
+  
+  try {
+    const params: any = {
+      name,
+      organization_name: company,
+      reveal_personal_emails: true,
+      reveal_phone_number: true,
+    };
+    
+    if (domain) params.domain = domain;
+    
+    log("\n⏳ Matching person (this consumes API credits)...", colors.yellow);
+    const result = await client.callTool("people_match", params);
+    
+    log("\n✅ Match results:", colors.green);
+    const data = JSON.parse(result.content[0].text);
+    
+    if (data.found) {
+      const person = data.person;
+      log(`\n${colors.bright}Person Found:${colors.reset}`);
+      log(`  Name: ${person.name}`);
+      log(`  Title: ${person.title || "N/A"}`);
+      log(`  Email: ${person.email || "N/A"}`);
+      log(`  Personal Emails: ${person.personal_emails.join(", ") || "None"}`);
+      log(`  Phone Numbers: ${person.phone_numbers.join(", ") || "None"}`);
+      log(`  LinkedIn: ${person.linkedin_url || "N/A"}`);
+      log(`  Credits Used: ${data.credits_used}`);
+    } else {
+      log("No matching person found.", colors.yellow);
+    }
+  } catch (error) {
+    log(`❌ People match failed: ${error}`, colors.red);
+  }
+}
+
+async function testEmailWorkflow(client: Client) {
+  log("\n📧 Testing Email Retrieval Workflow (Search + Match)", colors.cyan);
+  log("This demonstrates how to find someone's email in two steps.", colors.yellow);
+  
+  // Step 1: Search for person
+  const name = await prompt("\nEnter person's name to search for: ");
+  const company = await prompt("Enter their company (optional): ");
+  
+  try {
+    log("\n⏳ Step 1: Searching for person...", colors.yellow);
+    
+    const searchParams: any = { name, per_page: 5 };
+    if (company) searchParams.company = company;
+    
+    const searchResult = await client.callTool("people_search", searchParams);
+    const searchData = JSON.parse(searchResult.content[0].text);
+    
+    if (!searchData.results || searchData.results.length === 0) {
+      log("No people found with that search criteria.", colors.yellow);
+      return;
+    }
+    
+    log(`\n✅ Found ${searchData.results.length} people:", colors.green);
+    searchData.results.forEach((person: any, index: number) => {
+      log(`\n${index + 1}. ${person.name}`);
+      log(`   Title: ${person.title || "N/A"}`);
+      log(`   Company: ${person.company || "N/A"}`);
+      log(`   Location: ${person.location || "N/A"}`);
+    });
+    
+    const selection = await prompt("\nSelect person number to get email (1-" + searchData.results.length + "): ");
+    const selectedIndex = parseInt(selection) - 1;
+    
+    if (selectedIndex < 0 || selectedIndex >= searchData.results.length) {
+      log("Invalid selection.", colors.red);
+      return;
+    }
+    
+    const selectedPerson = searchData.results[selectedIndex];
+    
+    // Step 2: Match to get email
+    log("\n⏳ Step 2: Getting email address (consumes credits)...", colors.yellow);
+    
+    const matchParams: any = {
+      name: selectedPerson.name,
+      reveal_personal_emails: true,
+      reveal_phone_number: true,
+    };
+    
+    if (selectedPerson.company) matchParams.organization_name = selectedPerson.company;
+    if (selectedPerson.company_domain) matchParams.domain = selectedPerson.company_domain;
+    if (selectedPerson.linkedin_url) matchParams.linkedin_url = selectedPerson.linkedin_url;
+    
+    const matchResult = await client.callTool("people_match", matchParams);
+    const matchData = JSON.parse(matchResult.content[0].text);
+    
+    if (matchData.found) {
+      const person = matchData.person;
+      log(`\n✅ ${colors.bright}Email Retrieved Successfully:${colors.reset}`);
+      log(`  Primary Email: ${person.email || "Not found"}`);
+      if (person.personal_emails && person.personal_emails.length > 0) {
+        log(`  Personal Emails: ${person.personal_emails.join(", ")}`);
+      }
+      if (person.phone_numbers && person.phone_numbers.length > 0) {
+        log(`  Phone Numbers: ${person.phone_numbers.join(", ")}`);
+      }
+      log(`  Credits Used: ${matchData.credits_used}`);
+    } else {
+      log("Could not retrieve email for this person.", colors.yellow);
+    }
+    
+  } catch (error) {
+    log(`❌ Email workflow failed: ${error}`, colors.red);
   }
 }
 

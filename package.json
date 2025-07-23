@@ -12,9 +12,11 @@
     "format": "prettier --write src/**/*.ts",
     "clean": "rm -rf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:client": "tsx test/test-client.ts",
-    "test:manual": "tsx test/test-manual.ts",
-    "test:build": "npm run build && npm run test:client"
+    "test:client": "tsx tests/test-client.ts",
+    "test:manual": "tsx tests/test-manual.ts",
+    "test:email": "tsx tests/test-email-workflow.ts",
+    "test:build": "npm run build && npm run test:client",
+    "test:all": "npm run build && npm run test:manual && npm run test:email"
   },
   "repository": {
     "type": "git",

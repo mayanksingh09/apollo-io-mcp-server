@@ -96,3 +96,28 @@ Optional:
 - People search doesn't return email/phone (requires enrichment)
 - Credit-based system - each API call consumes credits
 - Free tier has no API access
+
+## Finding Email Addresses - Two-Step Process
+
+To retrieve email addresses for people found via search:
+
+1. **First, use `people_search`** to find prospects based on criteria (name, company, title, etc.)
+   - This returns basic info but NO email addresses
+   - Note the person's details (name, company, LinkedIn URL, etc.)
+
+2. **Then, use `people_match`** with identifying information to get emails
+   - Pass details from search results (name, company, domain, LinkedIn URL)
+   - Set `reveal_personal_emails: true` to include personal emails
+   - Set `reveal_phone_number: true` if phone numbers needed
+   - This endpoint consumes API credits
+
+**Example workflow for LLMs:**
+```
+User: "Find the email for John Smith at Acme Corp"
+1. Call people_search with name="John Smith" company="Acme Corp"
+2. From results, extract: name, organization_name, domain, linkedin_url
+3. Call people_match with those details + reveal_personal_emails=true
+4. Return the email address from people_match response
+```
+
+**Important:** The `people_match` endpoint is more accurate with more identifying information. Always pass as many details as available from the search results.
