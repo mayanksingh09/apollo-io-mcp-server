@@ -6,7 +6,13 @@ import { logger } from "../utils/logger.js";
 export const jobPostingsSchema = z.object({
   organization_id: z.string().describe("Apollo organization ID"),
   page: z.number().min(1).optional().default(1).describe("Page number"),
-  per_page: z.number().min(1).max(100).optional().default(25).describe("Results per page (max 100)"),
+  per_page: z
+    .number()
+    .min(1)
+    .max(100)
+    .optional()
+    .default(25)
+    .describe("Results per page (max 100)"),
 });
 
 export type JobPostingsParams = z.infer<typeof jobPostingsSchema>;
@@ -17,17 +23,17 @@ export async function jobPostingsTool(
 ): Promise<any> {
   try {
     logger.info("Fetching job postings", params);
-    
+
     const response = await apolloClient.getJobPostings(
       params.organization_id,
       params.page || 1,
       params.per_page || 25
     );
-    
+
     logger.info(`Found ${response.pagination.total_entries} job postings`);
-    
+
     return {
-      results: response.job_postings.map(job => ({
+      results: response.job_postings.map((job) => ({
         id: job.id,
         title: job.title,
         department: job.department,
