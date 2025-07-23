@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { ApolloClient } from "../apollo-client.js";
 import { logger } from "../utils/logger.js";
 import type { PeopleSearchRequest } from "../types/apollo.js";
@@ -19,8 +20,8 @@ export const peopleSearchSchema = z.object({
   organization_ids: z.array(z.string()).optional().describe("List of organization IDs"),
   person_seniorities: z.array(z.string()).optional().describe("Seniority levels (e.g., 'senior', 'manager', 'director')"),
   person_functions: z.array(z.string()).optional().describe("Job functions (e.g., 'sales', 'engineering', 'marketing')"),
-  page: z.number().min(1).max(500).optional().default(1).describe("Page number (max 500)"),
-  per_page: z.number().min(1).max(100).optional().default(25).describe("Results per page (max 100)"),
+  page: z.number().min(1).max(500).default(1).optional().describe("Page number (max 500)"),
+  per_page: z.number().min(1).max(100).default(25).optional().describe("Results per page (max 100)"),
 });
 
 export type PeopleSearchParams = z.infer<typeof peopleSearchSchema>;
@@ -71,5 +72,5 @@ export async function peopleSearchTool(
 export const peopleSearchDefinition = {
   name: "people_search",
   description: "Search for people in Apollo.io database with various filters",
-  inputSchema: peopleSearchSchema,
+  inputSchema: zodToJsonSchema(peopleSearchSchema),
 };

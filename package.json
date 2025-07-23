@@ -11,7 +11,10 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier --write src/**/*.ts",
     "clean": "rm -rf dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:client": "tsx test/test-client.ts",
+    "test:manual": "tsx test/test-manual.ts",
+    "test:build": "npm run build && npm run test:client"
   },
   "repository": {
     "type": "git",
@@ -47,6 +50,7 @@
     "eslint": "^9.31.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "zod-to-json-schema": "^3.24.6"
   }
 }

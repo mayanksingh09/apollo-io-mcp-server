@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { ApolloClient } from "../apollo-client.js";
 import { logger } from "../utils/logger.js";
 import type { OrganizationSearchRequest } from "../types/apollo.js";
@@ -16,8 +17,8 @@ export const organizationSearchSchema = z.object({
   technologies: z.array(z.string()).optional().describe("Technologies used by the company"),
   funding_raised_min: z.number().optional().describe("Minimum funding raised in USD"),
   funding_raised_max: z.number().optional().describe("Maximum funding raised in USD"),
-  page: z.number().min(1).max(500).optional().default(1).describe("Page number (max 500)"),
-  per_page: z.number().min(1).max(100).optional().default(25).describe("Results per page (max 100)"),
+  page: z.number().min(1).max(500).default(1).optional().describe("Page number (max 500)"),
+  per_page: z.number().min(1).max(100).default(25).optional().describe("Results per page (max 100)"),
 });
 
 export type OrganizationSearchParams = z.infer<typeof organizationSearchSchema>;
@@ -103,5 +104,5 @@ export async function organizationSearchTool(
 export const organizationSearchDefinition = {
   name: "organization_search",
   description: "Search for organizations/companies in Apollo.io database with various filters",
-  inputSchema: organizationSearchSchema,
+  inputSchema: zodToJsonSchema(organizationSearchSchema),
 };

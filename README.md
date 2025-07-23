@@ -232,8 +232,9 @@ npm run dev
 # Build for production
 npm run build
 
-# Run tests
-npm test
+# Run tests (see test/README.md for details)
+npm run test:client  # Interactive MCP test
+npm run test:manual  # Direct API test
 
 # Lint code
 npm run lint

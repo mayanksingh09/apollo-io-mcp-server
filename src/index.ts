@@ -11,8 +11,10 @@ import { logger } from "./utils/logger.js";
 import {
   peopleSearchTool,
   peopleSearchDefinition,
+  peopleSearchSchema,
   organizationSearchTool,
   organizationSearchDefinition,
+  organizationSearchSchema,
   peopleEnrichmentTool,
   peopleEnrichmentDefinition,
   organizationEnrichmentTool,
@@ -70,13 +72,13 @@ class ApolloMCPServer {
 
         switch (name) {
           case "people_search": {
-            const params = peopleSearchDefinition.inputSchema.parse(args);
+            const params = peopleSearchSchema.parse(args);
             const result = await peopleSearchTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
 
           case "organization_search": {
-            const params = organizationSearchDefinition.inputSchema.parse(args);
+            const params = organizationSearchSchema.parse(args);
             const result = await organizationSearchTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
