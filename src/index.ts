@@ -54,9 +54,9 @@ class ApolloMCPServer {
         tools: [
           peopleSearchDefinition,
           organizationSearchDefinition,
-          peopleEnrichmentDefinition,
-          organizationEnrichmentDefinition,
-          jobPostingsDefinition,
+          // peopleEnrichmentDefinition,
+          // organizationEnrichmentDefinition,
+          // jobPostingsDefinition,
         ],
       };
     });
