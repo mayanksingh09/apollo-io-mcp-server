@@ -23,6 +23,7 @@ export interface PeopleSearchRequest extends Pagination {
   organization_ids?: string[];
   person_seniorities?: string[];
   person_functions?: string[];
+  organization_num_employees_ranges?: string[];
 }
 
 export interface Person {
@@ -139,6 +140,50 @@ export interface OrganizationEnrichmentRequest {
 
 export interface OrganizationEnrichmentResponse {
   organization: Organization | null;
+}
+
+// People Match Types
+export interface PeopleMatchRequest {
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  name?: string;
+  organization_name?: string;
+  domain?: string;
+  linkedin_url?: string;
+  reveal_personal_emails?: boolean;
+  reveal_phone_number?: boolean;
+}
+
+export interface PeopleMatchResponse {
+  person?: {
+    id: string;
+    name: string;
+    first_name: string;
+    last_name: string;
+    title?: string;
+    email?: string;
+    email_status?: string;
+    personal_emails?: string[];
+    phone_numbers?: string[];
+    linkedin_url?: string;
+    photo_url?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    organization?: Organization;
+    seniority?: string;
+    functions?: string[];
+    employment_history?: Array<{
+      id: string;
+      organization_name: string;
+      title?: string;
+      start_date?: string;
+      end_date?: string;
+      current?: boolean;
+    }>;
+  };
+  credits_used?: number;
 }
 
 // Job Postings Types

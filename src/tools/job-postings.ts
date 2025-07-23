@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { ApolloClient } from "../apollo-client.js";
 import { logger } from "../utils/logger.js";
 
@@ -53,5 +54,5 @@ export async function jobPostingsTool(
 export const jobPostingsDefinition = {
   name: "job_postings",
   description: "Get current job postings for a specific organization",
-  inputSchema: jobPostingsSchema,
+  inputSchema: zodToJsonSchema(jobPostingsSchema),
 };
