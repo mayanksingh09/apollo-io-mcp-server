@@ -24,6 +24,9 @@ export interface PeopleSearchRequest extends Pagination {
   person_seniorities?: string[];
   person_functions?: string[];
   organization_num_employees_ranges?: string[];
+  contact_email_status?: string;
+  include_similar_titles?: boolean;
+  q_organization_domains_list?: string[];
 }
 
 export interface Person {

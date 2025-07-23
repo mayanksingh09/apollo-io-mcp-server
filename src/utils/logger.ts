@@ -23,7 +23,7 @@ class Logger {
   private formatMessage(level: LogLevel, message: string, data?: any): string {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-    
+
     if (data) {
       return `${prefix} ${message} ${JSON.stringify(data, null, 2)}`;
     }

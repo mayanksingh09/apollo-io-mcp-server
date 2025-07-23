@@ -4,18 +4,21 @@ import { ApolloClient } from "../apollo-client.js";
 import { logger } from "../utils/logger.js";
 import type { PeopleEnrichmentRequest } from "../types/apollo.js";
 
-export const peopleEnrichmentSchema = z.object({
-  email: z.string().email().optional().describe("Email address to enrich"),
-  linkedin_url: z.string().url().optional().describe("LinkedIn profile URL"),
-  name: z.string().optional().describe("Person's full name"),
-  organization_name: z.string().optional().describe("Company name"),
-  domain: z.string().optional().describe("Company domain"),
-}).refine(
-  (data) => data.email || data.linkedin_url || (data.name && (data.organization_name || data.domain)),
-  {
-    message: "Must provide either email, linkedin_url, or name with organization information",
-  }
-);
+export const peopleEnrichmentSchema = z
+  .object({
+    email: z.string().email().optional().describe("Email address to enrich"),
+    linkedin_url: z.string().url().optional().describe("LinkedIn profile URL"),
+    name: z.string().optional().describe("Person's full name"),
+    organization_name: z.string().optional().describe("Company name"),
+    domain: z.string().optional().describe("Company domain"),
+  })
+  .refine(
+    (data) =>
+      data.email || data.linkedin_url || (data.name && (data.organization_name || data.domain)),
+    {
+      message: "Must provide either email, linkedin_url, or name with organization information",
+    }
+  );
 
 export type PeopleEnrichmentParams = z.infer<typeof peopleEnrichmentSchema>;
 
@@ -25,10 +28,10 @@ export async function peopleEnrichmentTool(
 ): Promise<any> {
   try {
     logger.info("Executing people enrichment", params);
-    
+
     const enrichmentParams: PeopleEnrichmentRequest = params;
     const response = await apolloClient.enrichPerson(enrichmentParams);
-    
+
     if (!response.person) {
       return {
         found: false,
@@ -37,7 +40,7 @@ export async function peopleEnrichmentTool(
     }
 
     const person = response.person;
-    
+
     return {
       found: true,
       person: {
@@ -51,12 +54,14 @@ export async function peopleEnrichmentTool(
         linkedin_url: person.linkedin_url,
         photo_url: person.photo_url,
         location: [person.city, person.state, person.country].filter(Boolean).join(", "),
-        company: person.organization ? {
-          id: person.organization.id,
-          name: person.organization.name,
-          domain: person.organization.domain,
-          industry: person.organization.industry,
-        } : null,
+        company: person.organization
+          ? {
+              id: person.organization.id,
+              name: person.organization.name,
+              domain: person.organization.domain,
+              industry: person.organization.industry,
+            }
+          : null,
         seniority: person.seniority,
         functions: person.functions,
       },
