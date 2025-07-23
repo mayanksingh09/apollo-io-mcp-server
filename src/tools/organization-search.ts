@@ -18,7 +18,13 @@ export const organizationSearchSchema = z.object({
   funding_raised_min: z.number().optional().describe("Minimum funding raised in USD"),
   funding_raised_max: z.number().optional().describe("Maximum funding raised in USD"),
   page: z.number().min(1).max(500).default(1).optional().describe("Page number (max 500)"),
-  per_page: z.number().min(1).max(100).default(25).optional().describe("Results per page (max 100)"),
+  per_page: z
+    .number()
+    .min(1)
+    .max(100)
+    .default(25)
+    .optional()
+    .describe("Results per page (max 100)"),
 });
 
 export type OrganizationSearchParams = z.infer<typeof organizationSearchSchema>;
@@ -29,7 +35,7 @@ export async function organizationSearchTool(
 ): Promise<any> {
   try {
     logger.info("Executing organization search", params);
-    
+
     const searchParams: OrganizationSearchRequest = {
       q_keywords: params.q_keywords,
       name: params.name,
@@ -66,11 +72,11 @@ export async function organizationSearchTool(
     }
 
     const response = await apolloClient.searchOrganizations(searchParams);
-    
+
     logger.info(`Found ${response.pagination.total_entries} organizations`);
-    
+
     return {
-      results: response.organizations.map(org => ({
+      results: response.organizations.map((org) => ({
         id: org.id,
         name: org.name,
         domain: org.domain,

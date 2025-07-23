@@ -14,6 +14,8 @@ import type {
   OrganizationSearchResponse,
   PeopleEnrichmentRequest,
   PeopleEnrichmentResponse,
+  PeopleMatchRequest,
+  PeopleMatchResponse,
   OrganizationEnrichmentRequest,
   OrganizationEnrichmentResponse,
   JobPostingsResponse,
@@ -112,6 +114,15 @@ export class ApolloClient {
       method: "GET",
       url: "/people/enrich",
       params,
+    });
+  }
+
+  // People Match
+  async matchPerson(params: PeopleMatchRequest): Promise<PeopleMatchResponse> {
+    return this.request<PeopleMatchResponse>({
+      method: "POST",
+      url: "/people/match",
+      data: params,
     });
   }
 

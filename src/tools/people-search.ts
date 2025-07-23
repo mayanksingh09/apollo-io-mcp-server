@@ -18,10 +18,35 @@ export const peopleSearchSchema = z.object({
   organization_locations: z.array(z.string()).optional().describe("List of company locations"),
   q_organization_domains: z.array(z.string()).optional().describe("Query by organization domains"),
   organization_ids: z.array(z.string()).optional().describe("List of organization IDs"),
-  person_seniorities: z.array(z.string()).optional().describe("Seniority levels (e.g., 'senior', 'manager', 'director')"),
-  person_functions: z.array(z.string()).optional().describe("Job functions (e.g., 'sales', 'engineering', 'marketing')"),
+  person_seniorities: z
+    .array(z.string())
+    .optional()
+    .describe("Seniority levels (e.g., 'senior', 'manager', 'director')"),
+  person_functions: z
+    .array(z.string())
+    .optional()
+    .describe("Job functions (e.g., 'sales', 'engineering', 'marketing')"),
+  organization_num_employees_ranges: z
+    .array(z.string())
+    .optional()
+    .describe("List of employee count ranges (e.g., '1,10', '11,20', '21,50')"),
   page: z.number().min(1).max(500).default(1).optional().describe("Page number (max 500)"),
-  per_page: z.number().min(1).max(100).default(25).optional().describe("Results per page (max 100)"),
+  per_page: z
+    .number()
+    .min(1)
+    .max(100)
+    .default(25)
+    .optional()
+    .describe("Results per page (max 100)"),
+  contact_email_status: z.string().optional().describe("Filter by email verification status"),
+  include_similar_titles: z
+    .boolean()
+    .optional()
+    .describe("Include similar job titles in search results"),
+  q_organization_domains_list: z
+    .array(z.string())
+    .optional()
+    .describe("List of organization domains for searching"),
 });
 
 export type PeopleSearchParams = z.infer<typeof peopleSearchSchema>;
@@ -32,7 +57,7 @@ export async function peopleSearchTool(
 ): Promise<any> {
   try {
     logger.info("Executing people search", params);
-    
+
     const searchParams: PeopleSearchRequest = {
       ...params,
       page: params.page || 1,
@@ -40,11 +65,11 @@ export async function peopleSearchTool(
     };
 
     const response = await apolloClient.searchPeople(searchParams);
-    
+
     logger.info(`Found ${response.pagination.total_entries} people`);
-    
+
     return {
-      results: response.people.map(person => ({
+      results: response.people.map((person) => ({
         id: person.id,
         name: person.name,
         title: person.title,

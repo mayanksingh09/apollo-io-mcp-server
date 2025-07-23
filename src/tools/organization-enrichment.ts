@@ -1,17 +1,17 @@
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { ApolloClient } from "../apollo-client.js";
 import { logger } from "../utils/logger.js";
 import type { OrganizationEnrichmentRequest } from "../types/apollo.js";
 
-export const organizationEnrichmentSchema = z.object({
-  domain: z.string().optional().describe("Company domain (e.g., 'example.com')"),
-  name: z.string().optional().describe("Company name"),
-}).refine(
-  (data) => data.domain || data.name,
-  {
+export const organizationEnrichmentSchema = z
+  .object({
+    domain: z.string().optional().describe("Company domain (e.g., 'example.com')"),
+    name: z.string().optional().describe("Company name"),
+  })
+  .refine((data) => data.domain || data.name, {
     message: "Must provide either domain or company name",
-  }
-);
+  });
 
 export type OrganizationEnrichmentParams = z.infer<typeof organizationEnrichmentSchema>;
 
@@ -21,10 +21,10 @@ export async function organizationEnrichmentTool(
 ): Promise<any> {
   try {
     logger.info("Executing organization enrichment", params);
-    
+
     const enrichmentParams: OrganizationEnrichmentRequest = params;
     const response = await apolloClient.enrichOrganization(enrichmentParams);
-    
+
     if (!response.organization) {
       return {
         found: false,
@@ -33,7 +33,7 @@ export async function organizationEnrichmentTool(
     }
 
     const org = response.organization;
-    
+
     return {
       found: true,
       organization: {
@@ -76,5 +76,5 @@ export async function organizationEnrichmentTool(
 export const organizationEnrichmentDefinition = {
   name: "organization_enrichment",
   description: "Enrich organization/company data using domain or company name",
-  inputSchema: organizationEnrichmentSchema,
+  inputSchema: zodToJsonSchema(organizationEnrichmentSchema),
 };
