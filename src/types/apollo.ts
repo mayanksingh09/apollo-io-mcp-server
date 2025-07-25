@@ -212,6 +212,44 @@ export interface JobPostingsResponse {
   };
 }
 
+// Create Contact Types
+export interface CreateContactRequest {
+  first_name: string;
+  last_name: string;
+  title?: string;
+  organization_name?: string;
+  email?: string;
+  website_url?: string;
+  direct_phone?: string;
+  mobile_phone?: string;
+  label_names?: string[];
+  visibility?: 'all' | 'only-me';
+}
+
+export interface CreateContactResponse {
+  contact?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    name: string;
+    title?: string;
+    email?: string;
+    organization?: {
+      id: string;
+      name: string;
+      domain?: string;
+    };
+    direct_phone?: string;
+    mobile_phone?: string;
+    label_names?: string[];
+    visibility?: string;
+    created_at?: string;
+    updated_at?: string;
+  };
+  success?: boolean;
+  error?: string;
+}
+
 // API Error Response
 export interface ApolloAPIError {
   error: {

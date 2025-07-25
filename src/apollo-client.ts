@@ -19,6 +19,8 @@ import type {
   OrganizationEnrichmentRequest,
   OrganizationEnrichmentResponse,
   JobPostingsResponse,
+  CreateContactRequest,
+  CreateContactResponse,
   ApolloAPIError,
 } from "./types/apollo.js";
 
@@ -150,6 +152,15 @@ export class ApolloClient {
         page,
         per_page: perPage,
       },
+    });
+  }
+
+  // Create Contact
+  async createContact(params: CreateContactRequest): Promise<CreateContactResponse> {
+    return this.request<CreateContactResponse>({
+      method: "POST",
+      url: "/contacts",
+      data: params,
     });
   }
 
