@@ -5,6 +5,7 @@ import { peopleSearchTool } from "../src/tools/people-search.js";
 import { organizationSearchTool } from "../src/tools/organization-search.js";
 import { peopleEnrichmentTool } from "../src/tools/people-enrichment.js";
 import { peopleMatchTool } from "../src/tools/people-match.js";
+import { outreachEmailSearchTool } from "../src/tools/outreach-email-search.js";
 // Type definitions for the transformed results from our tools
 interface PersonResult {
   id: string;
@@ -91,6 +92,10 @@ async function manualTest() {
 
     if (testType === "email") {
       await testEmailWorkflowDirect(apolloClient);
+    }
+
+    if (testType === "outreach") {
+      await testOutreachEmailSearchDirect(apolloClient);
     }
 
     log("\n✅ All tests completed successfully!", colors.green);
@@ -359,6 +364,65 @@ async function testEmailWorkflowDirect(apolloClient: ApolloClient) {
   }
 }
 
+async function testOutreachEmailSearchDirect(apolloClient: ApolloClient) {
+  log("\n\n📧 Testing Outreach Email Search (Direct API)", colors.cyan);
+  log("Note: This endpoint requires a master API key and is not available on free plans!", colors.yellow);
+  
+  const testCases = [
+    {
+      name: "Search all outreach emails",
+      params: {
+        per_page: 5,
+      },
+    },
+    {
+      name: "Search by date range",
+      params: {
+        sent_at_after: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // Last 30 days
+        per_page: 5,
+      },
+    },
+  ];
+
+  for (const testCase of testCases) {
+    log(`\n📌 Test: ${testCase.name}`, colors.yellow);
+    log(`Parameters: ${JSON.stringify(testCase.params, null, 2)}`, colors.cyan);
+
+    try {
+      const result = await outreachEmailSearchTool(testCase.params, apolloClient);
+      
+      log("\n✅ Results:", colors.green);
+      if (result.results && result.results.length > 0) {
+        result.results.forEach((email: any, index: number) => {
+          log(`\n${colors.bright}Email ${index + 1}:${colors.reset}`);
+          log(`  Subject: ${email.subject || "N/A"}`);
+          log(`  From: ${email.from_email || "N/A"} (${email.from_name || "N/A"})`);
+          log(`  To: ${email.to_email || "N/A"} (${email.to_name || "N/A"})`);
+          log(`  Contact ID: ${email.contact_id || "N/A"}`);
+          log(`  Sent: ${email.sent_at || "N/A"}`);
+          log(`  Status: ${email.status || "N/A"}`);
+          log(`  Type: ${email.type || "N/A"}`);
+        });
+        
+        log(`\n${colors.cyan}Pagination:${colors.reset}`);
+        log(`  Current page: ${result.pagination.current_page}`);
+        log(`  Total results: ${result.pagination.total_results}`);
+        log(`  Total pages: ${result.pagination.total_pages}`);
+      } else {
+        log("No results found.", colors.yellow);
+      }
+    } catch (error: any) {
+      log(`❌ Test failed: ${error.message}`, colors.red);
+      if (error.response) {
+        log(`  Status: ${error.response.status}`, colors.red);
+        log(`  Response: ${JSON.stringify(error.response.data, null, 2)}`, colors.red);
+      }
+      // Log full error details for debugging
+      log(`  Full error: ${JSON.stringify(error, null, 2)}`, colors.red);
+    }
+  }
+}
+
 // Show usage if help is requested
 if (process.argv[2] === "--help" || process.argv[2] === "-h") {
   log("\nUsage: npm run test:manual [test-type]", colors.cyan);
@@ -368,6 +432,7 @@ if (process.argv[2] === "--help" || process.argv[2] === "-h") {
   log("  enrichment  - Test people enrichment");
   log("  match       - Test people match (uses credits!)");
   log("  email       - Test email workflow (search + match)");
+  log("  outreach    - Test outreach email search (requires master key)");
   log("  both        - Test people and org search (default)");
   log("\nExamples:");
   log("  npm run test:manual people");

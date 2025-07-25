@@ -23,6 +23,8 @@ import type {
   CreateContactResponse,
   ContactSearchRequest,
   ContactSearchResponse,
+  OutreachEmailSearchRequest,
+  OutreachEmailSearchResponse,
   ApolloAPIError,
 } from "./types/apollo.js";
 
@@ -89,6 +91,7 @@ export class ApolloClient {
   private async request<T>(config: AxiosRequestConfig): Promise<T> {
     logger.debug(`Making request to ${config.method} ${config.url}`, config.data || config.params);
     const response = await this.client.request<T>(config);
+    logger.debug(`Response from ${config.url}:`, JSON.stringify(response.data, null, 2));
     return response.data;
   }
 
@@ -175,6 +178,15 @@ export class ApolloClient {
     });
   }
 
+  // Outreach Email Search
+  async searchOutreachEmails(params: OutreachEmailSearchRequest): Promise<OutreachEmailSearchResponse> {
+    return this.request<OutreachEmailSearchResponse>({
+      method: "GET",
+      url: "/emailer_messages/search",
+      params,
+    });
+  }
+
   // Helper method to handle paginated results
   async *searchPeoplePaginated(
     params: PeopleSearchRequest,
@@ -220,6 +232,23 @@ export class ApolloClient {
       yield response;
 
       hasMore = response.pagination.page < response.pagination.total_pages;
+      page++;
+    }
+  }
+
+  async *searchOutreachEmailsPaginated(
+    params: OutreachEmailSearchRequest,
+    maxPages = 10
+  ): AsyncGenerator<OutreachEmailSearchResponse, void, unknown> {
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && page <= maxPages) {
+      const response = await this.searchOutreachEmails({ ...params, page, per_page: 100 });
+      yield response;
+
+      // Since the API doesn't return pagination info, continue until no results
+      hasMore = response.emailer_messages && response.emailer_messages.length > 0;
       page++;
     }
   }

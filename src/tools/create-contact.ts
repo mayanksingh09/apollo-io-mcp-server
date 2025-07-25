@@ -14,10 +14,7 @@ export const createContactSchema = z.object({
   direct_phone: z.string().optional().describe("Direct phone number"),
   mobile_phone: z.string().optional().describe("Mobile phone number"),
   label_names: z.array(z.string()).optional().describe("Labels to assign to the contact"),
-  visibility: z
-    .enum(["all", "only-me"])
-    .optional()
-    .describe("Contact visibility (default: 'all')"),
+  visibility: z.enum(["all", "only-me"]).optional().describe("Contact visibility (default: 'all')"),
 });
 
 export type CreateContactParams = z.infer<typeof createContactSchema>;
