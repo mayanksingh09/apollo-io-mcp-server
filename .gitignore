@@ -174,3 +174,6 @@ vite.config.ts.timestamp-*
 
 # Claude MCP
 .mcp.json
+
+# Claude commands
+.claude/commands/

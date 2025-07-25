@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "apollo": {
-      "command": "node",
-      "args": ["/Users/mayanksingh/CursorProjects/apollo-io-mcp-server/dist/index.js"]
-    }
-  }
-}

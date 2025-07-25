@@ -153,6 +153,31 @@ The `create_contact` tool allows you to add new contacts to your Apollo.io accou
 
 **IMPORTANT:** Apollo does NOT apply deduplication when creating contacts via API. Even if a contact with identical details exists, a new duplicate contact will be created. To update existing contacts, use the Update Contact endpoint (not yet implemented in this MCP server).
 
+## Contact Search vs People Search
+
+The MCP server provides two different search tools:
+
+1. **`people_search`** - Searches the entire Apollo.io database
+   - Returns people from Apollo's global database
+   - Does NOT return email addresses (requires enrichment/match)
+   - Useful for finding new prospects
+
+2. **`contact_search`** - Searches only YOUR team's saved contacts
+   - Returns contacts you've already added to your Apollo account
+   - Includes email addresses and phone numbers if available
+   - Limited to 50,000 results (500 pages × 100/page)
+   - Not available on free Apollo plans
+   - Useful for finding existing contacts in your CRM
+
+**Example workflow:**
+```
+# Find new prospects in Apollo's database
+people_search(company="Acme Corp", title="CEO")
+
+# Search your existing contacts
+contact_search(company="Acme Corp", label_names=["qualified"])
+```
+
 ## TypeScript Configuration
 
 - Target: ES2022, Module: ESNext with Node resolution

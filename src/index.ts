@@ -30,6 +30,9 @@ import {
   createContactTool,
   createContactDefinition,
   createContactSchema,
+  contactSearchTool,
+  contactSearchDefinition,
+  contactSearchSchema,
 } from "./tools/index.js";
 
 class ApolloMCPServer {
@@ -70,6 +73,7 @@ class ApolloMCPServer {
           organizationEnrichmentDefinition,
           jobPostingsDefinition,
           createContactDefinition,
+          contactSearchDefinition,
         ],
       };
     });
@@ -121,6 +125,12 @@ class ApolloMCPServer {
           case "create_contact": {
             const params = createContactSchema.parse(args);
             const result = await createContactTool(params, this.apolloClient);
+            return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+          }
+
+          case "contact_search": {
+            const params = contactSearchSchema.parse(args);
+            const result = await contactSearchTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
 
