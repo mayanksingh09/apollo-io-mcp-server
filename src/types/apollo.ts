@@ -223,7 +223,7 @@ export interface CreateContactRequest {
   direct_phone?: string;
   mobile_phone?: string;
   label_names?: string[];
-  visibility?: 'all' | 'only-me';
+  visibility?: "all" | "only-me";
 }
 
 export interface CreateContactResponse {
@@ -266,7 +266,7 @@ export interface ContactSearchRequest extends Pagination {
   person_seniorities?: string[];
   person_functions?: string[];
   organization_num_employees_ranges?: string[];
-  contact_type?: 'person' | 'company';
+  contact_type?: "person" | "company";
   contact_email_status?: string;
   label_names?: string[];
 }
@@ -309,6 +309,101 @@ export interface ContactSearchResponse {
     total_entries: number;
     total_pages: number;
   };
+}
+
+// Outreach Email Search
+export interface OutreachEmailSearchRequest {
+  subject?: string;
+  body?: string;
+  from_address?: string;
+  to_address?: string;
+  bounce_type?: string;
+  sent_at_before?: string;
+  sent_at_after?: string;
+  delivered_at_before?: string;
+  delivered_at_after?: string;
+  opened_at_before?: string;
+  opened_at_after?: string;
+  clicked_at_before?: string;
+  clicked_at_after?: string;
+  bounced_at_before?: string;
+  bounced_at_after?: string;
+  replied_at_before?: string;
+  replied_at_after?: string;
+  emailer_campaign_ids?: string[];
+  contact_ids?: string[];
+  page?: number;
+  per_page?: number;
+}
+
+export interface OutreachEmail {
+  id: string;
+  user_id?: string;
+  status?: string;
+  time_zone?: string | null;
+  provider_message_id?: string;
+  to_name?: string;
+  due_at?: string;
+  completed_at?: string;
+  emailer_touch_id?: string | null;
+  emailer_campaign_id?: string | null;
+  emailer_step_id?: string | null;
+  failed_at?: string | null;
+  failure_reason?: string | null;
+  attachment_ids?: string[];
+  enable_tracking?: boolean;
+  type?: string;
+  contact_id?: string;
+  provider_thread_id?: string;
+  schedule_delayed_reason?: string | null;
+  demoed?: boolean | null;
+  email_account_id?: string;
+  due_at_manually_changed?: boolean;
+  not_sent_reason?: string | null;
+  bounce?: any | null;
+  spam_blocked?: boolean | null;
+  tracking_disabled_reason?: string;
+  created_at?: string;
+  async_sending?: boolean;
+  due_at_source?: string;
+  crm_id?: string | null;
+  replied?: boolean | null;
+  needs_dynamic_assemble?: boolean;
+  personalized_opener?: string | null;
+  reply_class?: string | null;
+  schedule_delayed_limit_reason?: string | null;
+  schedule_delayed_reason_details?: string | null;
+  sensitive_info_redacted?: boolean | null;
+  account_id?: string;
+  recipients?: Array<{
+    email: string;
+    raw_name: string;
+    recipient_type_cd: string;
+    contact_id: string | null;
+    user_id: string | null;
+  }>;
+  send_from?: {
+    email: string;
+    raw_name: string;
+    recipient_type_cd: string | null;
+    contact_id: string | null;
+    user_id: string | null;
+  };
+  from_email?: string;
+  to_email?: string;
+  from_name?: string;
+  bcc_emails?: string[];
+  cc_emails?: string[];
+  send_from_info?: string;
+  body_text?: string;
+  subject?: string;
+}
+
+export interface OutreachEmailSearchResponse {
+  breadcrumbs: any[];
+  emailer_messages: OutreachEmail[];
+  emailer_steps: any[];
+  num_fetch_result: number | null;
 }
 
 // API Error Response

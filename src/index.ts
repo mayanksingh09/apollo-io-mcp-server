@@ -33,6 +33,9 @@ import {
   contactSearchTool,
   contactSearchDefinition,
   contactSearchSchema,
+  outreachEmailSearchTool,
+  outreachEmailSearchDefinition,
+  outreachEmailSearchSchema,
 } from "./tools/index.js";
 
 class ApolloMCPServer {
@@ -74,6 +77,7 @@ class ApolloMCPServer {
           jobPostingsDefinition,
           createContactDefinition,
           contactSearchDefinition,
+          outreachEmailSearchDefinition,
         ],
       };
     });
@@ -131,6 +135,12 @@ class ApolloMCPServer {
           case "contact_search": {
             const params = contactSearchSchema.parse(args);
             const result = await contactSearchTool(params, this.apolloClient);
+            return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+          }
+
+          case "outreach_email_search": {
+            const params = outreachEmailSearchSchema.parse(args);
+            const result = await outreachEmailSearchTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
 
