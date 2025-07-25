@@ -27,6 +27,12 @@ import {
   jobPostingsTool,
   jobPostingsDefinition,
   jobPostingsSchema,
+  createContactTool,
+  createContactDefinition,
+  createContactSchema,
+  contactSearchTool,
+  contactSearchDefinition,
+  contactSearchSchema,
 } from "./tools/index.js";
 
 class ApolloMCPServer {
@@ -66,6 +72,8 @@ class ApolloMCPServer {
           peopleMatchDefinition,
           organizationEnrichmentDefinition,
           jobPostingsDefinition,
+          createContactDefinition,
+          contactSearchDefinition,
         ],
       };
     });
@@ -111,6 +119,18 @@ class ApolloMCPServer {
           case "job_postings": {
             const params = jobPostingsSchema.parse(args);
             const result = await jobPostingsTool(params, this.apolloClient);
+            return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+          }
+
+          case "create_contact": {
+            const params = createContactSchema.parse(args);
+            const result = await createContactTool(params, this.apolloClient);
+            return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+          }
+
+          case "contact_search": {
+            const params = contactSearchSchema.parse(args);
+            const result = await contactSearchTool(params, this.apolloClient);
             return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
           }
 

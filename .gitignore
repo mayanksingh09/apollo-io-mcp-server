@@ -168,3 +168,12 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Cursor MCP
+.cursor/mcp.json
+
+# Claude MCP
+.mcp.json
+
+# Claude commands
+.claude/commands/

@@ -19,6 +19,10 @@ import type {
   OrganizationEnrichmentRequest,
   OrganizationEnrichmentResponse,
   JobPostingsResponse,
+  CreateContactRequest,
+  CreateContactResponse,
+  ContactSearchRequest,
+  ContactSearchResponse,
   ApolloAPIError,
 } from "./types/apollo.js";
 
@@ -153,6 +157,24 @@ export class ApolloClient {
     });
   }
 
+  // Create Contact
+  async createContact(params: CreateContactRequest): Promise<CreateContactResponse> {
+    return this.request<CreateContactResponse>({
+      method: "POST",
+      url: "/contacts",
+      data: params,
+    });
+  }
+
+  // Contact Search
+  async searchContacts(params: ContactSearchRequest): Promise<ContactSearchResponse> {
+    return this.request<ContactSearchResponse>({
+      method: "POST",
+      url: "/contacts/search",
+      data: params,
+    });
+  }
+
   // Helper method to handle paginated results
   async *searchPeoplePaginated(
     params: PeopleSearchRequest,
@@ -179,6 +201,22 @@ export class ApolloClient {
 
     while (hasMore && page <= maxPages) {
       const response = await this.searchOrganizations({ ...params, page, per_page: 100 });
+      yield response;
+
+      hasMore = response.pagination.page < response.pagination.total_pages;
+      page++;
+    }
+  }
+
+  async *searchContactsPaginated(
+    params: ContactSearchRequest,
+    maxPages = 10
+  ): AsyncGenerator<ContactSearchResponse, void, unknown> {
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && page <= maxPages) {
+      const response = await this.searchContacts({ ...params, page, per_page: 100 });
       yield response;
 
       hasMore = response.pagination.page < response.pagination.total_pages;

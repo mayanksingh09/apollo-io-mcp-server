@@ -16,3 +16,5 @@ export {
   organizationEnrichmentSchema,
 } from "./organization-enrichment.js";
 export { jobPostingsTool, jobPostingsDefinition, jobPostingsSchema } from "./job-postings.js";
+export { createContactTool, createContactDefinition, createContactSchema } from "./create-contact.js";
+export { contactSearchTool, contactSearchDefinition, contactSearchSchema } from "./contact-search.js";

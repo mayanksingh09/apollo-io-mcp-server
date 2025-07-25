@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "apollo": {
+      "command": "node",
+      "args": ["<PATH_TO_APOLLO_IO_MCP_SERVER_DIST_INDEX_JS>"]
+    }
+  }
+}

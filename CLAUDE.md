@@ -82,6 +82,16 @@ Optional:
 3. Server communicates via stdio (not HTTP)
 4. Configure in Claude Desktop's config.json to test with AI
 
+### Test Scripts
+
+```bash
+npm run test:client    # Interactive menu-driven MCP client test
+npm run test:manual    # Direct API testing without MCP protocol
+npm run test:email     # Test two-step email retrieval workflow
+npm run test:build     # Build and run client test
+npm run test:all       # Run all tests after building
+```
+
 ## Common Issues
 
 **"Cannot find module" errors**: Run `npm run build` first - server runs from `dist/`
@@ -96,6 +106,7 @@ Optional:
 - People search doesn't return email/phone (requires enrichment)
 - Credit-based system - each API call consumes credits
 - Free tier has no API access
+- Create Contact API does NOT apply deduplication - will create duplicates if similar contacts exist
 
 ## Finding Email Addresses - Two-Step Process
 
@@ -121,3 +132,76 @@ User: "Find the email for John Smith at Acme Corp"
 ```
 
 **Important:** The `people_match` endpoint is more accurate with more identifying information. Always pass as many details as available from the search results.
+
+## Creating New Contacts
+
+The `create_contact` tool allows you to add new contacts to your Apollo.io account:
+
+**Required fields:**
+- `first_name`: Contact's first name
+- `last_name`: Contact's last name
+
+**Optional fields:**
+- `title`: Job title
+- `organization_name`: Company name
+- `email`: Email address
+- `website_url`: Company website
+- `direct_phone`: Direct phone number
+- `mobile_phone`: Mobile number
+- `label_names`: Array of labels
+- `visibility`: 'all' or 'only-me' (default: 'all')
+
+**IMPORTANT:** Apollo does NOT apply deduplication when creating contacts via API. Even if a contact with identical details exists, a new duplicate contact will be created. To update existing contacts, use the Update Contact endpoint (not yet implemented in this MCP server).
+
+## Contact Search vs People Search
+
+The MCP server provides two different search tools:
+
+1. **`people_search`** - Searches the entire Apollo.io database
+   - Returns people from Apollo's global database
+   - Does NOT return email addresses (requires enrichment/match)
+   - Useful for finding new prospects
+
+2. **`contact_search`** - Searches only YOUR team's saved contacts
+   - Returns contacts you've already added to your Apollo account
+   - Includes email addresses and phone numbers if available
+   - Limited to 50,000 results (500 pages × 100/page)
+   - Not available on free Apollo plans
+   - Useful for finding existing contacts in your CRM
+
+**Example workflow:**
+```
+# Find new prospects in Apollo's database
+people_search(company="Acme Corp", title="CEO")
+
+# Search your existing contacts
+contact_search(company="Acme Corp", label_names=["qualified"])
+```
+
+## TypeScript Configuration
+
+- Target: ES2022, Module: ESNext with Node resolution
+- Strict mode enabled with all type checking options
+- Source maps and declarations generated
+- Output directory: `dist/`
+- Node 18+ required
+
+## Directory Structure
+
+```
+src/
+├── index.ts          # Server entry point, tool registration
+├── apollo-client.ts  # Apollo.io API client with all endpoints
+├── config/          # Environment configuration
+├── tools/           # Individual tool implementations
+├── types/           # TypeScript type definitions
+└── utils/           # Error classes and utilities
+```
+
+## Code Style
+
+- ESLint with TypeScript plugin for linting
+- Prettier for code formatting
+- ES modules throughout (no CommonJS)
+- Async/await for all asynchronous operations
+- Zod schemas for runtime validation

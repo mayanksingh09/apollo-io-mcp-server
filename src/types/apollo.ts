@@ -212,6 +212,105 @@ export interface JobPostingsResponse {
   };
 }
 
+// Create Contact Types
+export interface CreateContactRequest {
+  first_name: string;
+  last_name: string;
+  title?: string;
+  organization_name?: string;
+  email?: string;
+  website_url?: string;
+  direct_phone?: string;
+  mobile_phone?: string;
+  label_names?: string[];
+  visibility?: 'all' | 'only-me';
+}
+
+export interface CreateContactResponse {
+  contact?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    name: string;
+    title?: string;
+    email?: string;
+    organization?: {
+      id: string;
+      name: string;
+      domain?: string;
+    };
+    direct_phone?: string;
+    mobile_phone?: string;
+    label_names?: string[];
+    visibility?: string;
+    created_at?: string;
+    updated_at?: string;
+  };
+  success?: boolean;
+  error?: string;
+}
+
+// Contact Search Types
+export interface ContactSearchRequest extends Pagination {
+  q_keywords?: string;
+  name?: string;
+  email?: string;
+  title?: string;
+  company?: string;
+  location?: string;
+  industry?: string;
+  person_titles?: string[];
+  organization_domains?: string[];
+  person_locations?: string[];
+  organization_locations?: string[];
+  person_seniorities?: string[];
+  person_functions?: string[];
+  organization_num_employees_ranges?: string[];
+  contact_type?: 'person' | 'company';
+  contact_email_status?: string;
+  label_names?: string[];
+}
+
+export interface Contact {
+  id: string;
+  first_name: string;
+  last_name: string;
+  name: string;
+  title?: string;
+  email?: string;
+  email_status?: string;
+  phone_numbers?: string[];
+  direct_phone?: string;
+  mobile_phone?: string;
+  linkedin_url?: string;
+  photo_url?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  organization?: {
+    id: string;
+    name: string;
+    domain: string;
+    industry?: string;
+  };
+  seniority?: string;
+  functions?: string[];
+  label_names?: string[];
+  visibility?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ContactSearchResponse {
+  contacts: Contact[];
+  pagination: {
+    page: number;
+    per_page: number;
+    total_entries: number;
+    total_pages: number;
+  };
+}
+
 // API Error Response
 export interface ApolloAPIError {
   error: {
