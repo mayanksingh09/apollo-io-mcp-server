@@ -24,16 +24,27 @@ export interface PeopleSearchRequest extends Pagination {
   person_seniorities?: string[];
   person_functions?: string[];
   organization_num_employees_ranges?: string[];
-  contact_email_status?: string;
+  contact_email_status?: string[];
   include_similar_titles?: boolean;
   q_organization_domains_list?: string[];
+  // New API parameters
+  revenue_range?: { min?: number; max?: number };
+  currently_using_any_of_technology_uids?: string[];
+  currently_using_all_of_technology_uids?: string[];
+  currently_not_using_any_of_technology_uids?: string[];
+  q_organization_job_titles?: string[];
+  organization_job_locations?: string[];
+  organization_num_jobs_range?: { min?: number; max?: number };
+  organization_job_posted_at_range?: { min?: string; max?: string };
+  job_seniority?: string[];
 }
 
 export interface Person {
   id: string;
   first_name: string;
-  last_name: string;
-  name: string;
+  last_name?: string;
+  last_name_obfuscated?: string;
+  name?: string;
   title: string;
   email?: string;
   phone_numbers?: string[];
@@ -42,20 +53,39 @@ export interface Person {
   city?: string;
   state?: string;
   country?: string;
+  // New API response fields (boolean flags)
+  last_refreshed_at?: string;
+  has_email?: boolean;
+  has_city?: boolean;
+  has_state?: boolean;
+  has_country?: boolean;
+  has_direct_phone?: string; // Returns "Yes" or "No"
   organization?: {
-    id: string;
+    id?: string;
     name: string;
-    domain: string;
+    domain?: string;
     industry?: string;
+    // New API response fields for organization
+    has_industry?: boolean;
+    has_phone?: boolean;
+    has_city?: boolean;
+    has_state?: boolean;
+    has_country?: boolean;
+    has_zip_code?: boolean;
+    has_revenue?: boolean;
+    has_employee_count?: boolean;
   };
   seniority?: string;
   functions?: string[];
 }
 
 export interface PeopleSearchResponse {
-  breadcrumbs: any[];
+  breadcrumbs?: any[];
   people: Person[];
-  pagination: {
+  // New API returns total_entries at root level
+  total_entries?: number;
+  // Legacy pagination structure (for backwards compatibility)
+  pagination?: {
     page: number;
     per_page: number;
     total_entries: number;

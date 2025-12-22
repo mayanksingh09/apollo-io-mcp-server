@@ -95,11 +95,11 @@ export class ApolloClient {
     return response.data;
   }
 
-  // People Search
+  // People Search (using new API endpoint that doesn't consume credits)
   async searchPeople(params: PeopleSearchRequest): Promise<PeopleSearchResponse> {
     return this.request<PeopleSearchResponse>({
       method: "POST",
-      url: "/mixed_people/search",
+      url: "/mixed_people/api_search",
       data: params,
     });
   }
@@ -194,12 +194,16 @@ export class ApolloClient {
   ): AsyncGenerator<PeopleSearchResponse, void, unknown> {
     let page = 1;
     let hasMore = true;
+    const perPage = 100;
 
     while (hasMore && page <= maxPages) {
-      const response = await this.searchPeople({ ...params, page, per_page: 100 });
+      const response = await this.searchPeople({ ...params, page, per_page: perPage });
       yield response;
 
-      hasMore = response.pagination.page < response.pagination.total_pages;
+      // Handle both new and legacy response formats
+      const totalEntries = response.total_entries ?? response.pagination?.total_entries ?? 0;
+      const totalPages = response.pagination?.total_pages ?? Math.ceil(totalEntries / perPage);
+      hasMore = page < totalPages;
       page++;
     }
   }

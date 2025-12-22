@@ -104,7 +104,8 @@ npm run test:all       # Run all tests after building
 
 - Search limited to 50,000 total results (500 pages × 100/page)
 - People search doesn't return email/phone (requires enrichment)
-- Credit-based system - each API call consumes credits
+- People search returns obfuscated last names (e.g., "Smi***h") and boolean flags for data availability
+- Credit-based system - most API calls consume credits, but people_search does NOT consume credits
 - Free tier has no API access
 - Create Contact API does NOT apply deduplication - will create duplicates if similar contacts exist
 
@@ -159,8 +160,19 @@ The MCP server provides two different search tools:
 
 1. **`people_search`** - Searches the entire Apollo.io database
    - Returns people from Apollo's global database
+   - Does NOT consume API credits (optimized API endpoint)
+   - Returns obfuscated last names and boolean flags (`has_email`, `has_city`, etc.)
    - Does NOT return email addresses (requires enrichment/match)
    - Useful for finding new prospects
+   - **New filtering options:**
+     - `revenue_range_min/max` - Filter by company revenue
+     - `currently_using_any_of_technology_uids` - Find companies using specific technologies (e.g., 'salesforce', 'google_analytics')
+     - `q_organization_job_titles` - Filter by job titles in active postings
+     - `organization_job_locations` - Filter by job posting locations
+     - `organization_num_jobs_range_min/max` - Filter by number of active job postings
+     - `organization_job_posted_at_range_min/max` - Filter by job posting dates
+     - `job_seniority` - Filter by seniority levels ('owner', 'founder', 'c_suite', 'vp', 'director', 'manager', 'senior', 'entry', 'intern')
+     - `contact_email_status` - Array of statuses: 'verified', 'unverified', 'likely to engage', 'unavailable'
 
 2. **`contact_search`** - Searches only YOUR team's saved contacts
    - Returns contacts you've already added to your Apollo account
@@ -173,6 +185,9 @@ The MCP server provides two different search tools:
 ```
 # Find new prospects in Apollo's database
 people_search(company="Acme Corp", title="CEO")
+
+# Find prospects at companies using Salesforce
+people_search(person_titles=["CTO"], currently_using_any_of_technology_uids=["salesforce"])
 
 # Search your existing contacts
 contact_search(company="Acme Corp", label_names=["qualified"])
